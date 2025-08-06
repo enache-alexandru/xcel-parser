@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "dependencies": {
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "node-xlsx": "^0.24.0",
+    "npm": "^11.5.2"
+  }
+}
