@@ -164,7 +164,7 @@ export default function setupJsonPreviewGlobalsRoute(app) {
           <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;">
             <label>Categorie <input name="colCategorie" value="${escapeHtml(colCategorie)}" /></label>
             <label>Tip <input name="colTip" value="${escapeHtml(colTip)}" /></label>
-            <label>Pachet <input name="colPachet" value="${escapeHtml(colPachet)}" /></label>
+            <label>Nume <input name="colPachet" value="${escapeHtml(colPachet)}" /></label>
             <label>Valoare <input name="colValoare" value="${escapeHtml(colValoare)}" /></label>
             <button type="submit">Aplică</button>
           </div>
