@@ -107,7 +107,7 @@ function buildNestedFromGrid(grid, {
 
     if (!out[catKey]) out[catKey] = {};
     if (!out[catKey][tipKey]) out[catKey][tipKey] = {};
-    out[catKey][tipKey][packKey] = rawVal;
+    out[catKey][tipKey][packKey] = String(rawVal).replace(".",",");
   }
 
   return out;
@@ -118,7 +118,7 @@ export default function setupJsonPreviewGlobalsRoute(app) {
     const history = readHistory();
     if (!history.length && !req.query.file) {
       return res.send(renderPage('JSON Preview (Variabile_Globale)', `
-        <h1>JSON Preview (Variabile_Globale)</h1>
+        <h1>JSON Preview</h1>
         <p class="muted">Nu există fișiere în istoric. Încarcă mai întâi un fișier.</p>
       `));
     }
@@ -130,7 +130,7 @@ export default function setupJsonPreviewGlobalsRoute(app) {
     const filepath = path.join('uploads', storedName);
     if (!fs.existsSync(filepath)) {
       return res.send(renderPage('JSON Preview (Variabile_Globale)', `
-        <h1>JSON Preview (Variabile_Globale)</h1>
+        <h1>JSON Preview</h1>
         <p class="muted">Fișierul nu există pe disc: <code>${storedName}</code></p>
       `));
     }
