@@ -16,7 +16,7 @@ function readHistory() {
 function readExcelData(filepath) {
   try {
     const sheets = xlsx.parse(fs.readFileSync(filepath));
-    return sheets[0]?.data || [];
+    return sheets[1]?.data || [];
   } catch {
     return [];
   }

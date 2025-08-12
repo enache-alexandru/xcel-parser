@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import xlsx from 'node-xlsx';
 import { renderPage } from '../render.js';
+import { readExcelSheet } from '../helpers/readExcelSheet.js';
 
 const historyPath = path.join('uploads', 'history.json');
 
@@ -17,7 +18,13 @@ function readHistory() {
 function readExcelData(filepath) {
   try {
     const sheets = xlsx.parse(fs.readFileSync(filepath));
-    return sheets[0]?.data || [];
+    console.log("sheets",sheets.length);
+    if(sheets.length > 1) {
+      return sheets[1]?.data || [];
+    } else {
+      return sheets[0]?.data || [];
+    }
+    
   } catch {
     return [];
   }
