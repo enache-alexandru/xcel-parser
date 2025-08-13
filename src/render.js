@@ -7,7 +7,7 @@ export function renderPage(title, bodyHtml) {
       <meta charset="UTF-8" />
       <title>${title}</title>
       <style>
-        body { font-family: sans-serif; padding: 20px; max-width: 1200px; margin: auto; }
+        body { font-family: sans-serif; padding: 20px; max-width: 1200px; margin: auto !important; }
         nav { background: #f5f5f5; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
         nav a { margin-right: 15px; text-decoration: none; color: #007bff; font-weight: bold; }
         nav a:hover { text-decoration: underline; }
@@ -26,6 +26,7 @@ export function renderPage(title, bodyHtml) {
         <a href="/history">Istoric</a>
         <a href="/compare">Comparare</a>
         <a href="/json-preview-globals">JSON Preview</a>
+        <a href="/freemarker-preview-globals">Freemarker Preview</a>
       </nav>
       ${bodyHtml}
     </body>
