@@ -118,10 +118,10 @@ export default function setupFreemarkerPreviewGlobalsRoute(app) {
   app.get('/freemarker-preview-globals', (req, res) => {
     const history = readHistory();
     if (!history.length && !req.query.file) {
-      return res.send(renderPage('Freemarker Preview (Variabile_Globale)', `
+      return res.send(renderPage('Variabile Globale (Freemarker Preview)', `
         <h1>Freemarker Preview</h1>
         <p class="muted">Nu există fișiere în istoric. Încarcă mai întâi un fișier.</p>
-      `));
+      `, req.path));
     }
 
     const storedName = req.query.file
@@ -130,10 +130,10 @@ export default function setupFreemarkerPreviewGlobalsRoute(app) {
 
     const filepath = path.join('uploads', storedName);
     if (!fs.existsSync(filepath)) {
-      return res.send(renderPage('Freemarker Preview (Variabile_Globale)', `
+      return res.send(renderPage('Variabile Globale (Freemarker Preview)', `
         <h1>Freemarker Preview</h1>
         <p class="muted">Fișierul nu există pe disc: <code>${storedName}</code></p>
-      `));
+      `, req.path));
     }
 
     // Poți override numele coloanelor prin query dacă e nevoie.
@@ -150,8 +150,8 @@ export default function setupFreemarkerPreviewGlobalsRoute(app) {
       `<option value="${h.storedName}" ${h.storedName === storedName ? 'selected' : ''}>${h.originalName}</option>`
     ).join('');
 
-    res.send(renderPage('Freemarker Preview (Variabile_Globale)', `
-      <h1>Freemarker Preview (Variabile_Globale)</h1>
+    res.send(renderPage('Variabile Globale (Freemarker Preview)', `
+      <h1>Variabile Globale (Freemarker Preview)</h1>
 
       <form method="get" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap; margin-bottom: 12px;">
         <label>
@@ -176,10 +176,10 @@ export default function setupFreemarkerPreviewGlobalsRoute(app) {
         Fișier: <code>${storedName}</code> • Sheet: <code>${foundName ?? '(nu există Variabile_Globale)'}</code>
       </div>
 
-      <h3 style="margin-top:16px;">Preview Freemarker (construit din sheet-ul "Variabile_Globale")</h3>
       <pre class="json">${jsonPretty}</pre>
 
-      <p class="muted">Notă: cheile sunt normalizate la <em>snake_case</em> (ex: "Cu Asigurare" → "cu_asigurare").</p>
-    `));
+      <pre class="json" stle="font-size: 15em">Exemplu declarare variabila globala: \${gv.ipotecar.fix.cu_asigurare}</pre>
+      <!-- <p class="muted">Notă: cheile sunt normalizate la <em>snake_case</em> (ex: "Cu Asigurare" → "cu_asigurare").</p> -->
+    `, req.path));
   });
 }

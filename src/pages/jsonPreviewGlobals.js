@@ -120,7 +120,7 @@ export default function setupJsonPreviewGlobalsRoute(app) {
       return res.send(renderPage('JSON Preview (Variabile_Globale)', `
         <h1>JSON Preview</h1>
         <p class="muted">Nu există fișiere în istoric. Încarcă mai întâi un fișier.</p>
-      `));
+      `, req.path));
     }
 
     const storedName = req.query.file
@@ -132,7 +132,7 @@ export default function setupJsonPreviewGlobalsRoute(app) {
       return res.send(renderPage('JSON Preview (Variabile_Globale)', `
         <h1>JSON Preview</h1>
         <p class="muted">Fișierul nu există pe disc: <code>${storedName}</code></p>
-      `));
+      `, req.path));
     }
 
     // Poți override numele coloanelor prin query dacă e nevoie.
@@ -179,6 +179,6 @@ export default function setupJsonPreviewGlobalsRoute(app) {
       <pre class="json">${jsonPretty}</pre>
 
       <p class="muted">Notă: cheile sunt normalizate la <em>snake_case</em> (ex: "Cu Asigurare" → "cu_asigurare").</p>
-    `));
+    `, req.path));
   });
 }

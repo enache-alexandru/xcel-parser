@@ -19,7 +19,7 @@ setupFreemarkerPreviewGlobalsRoute(app);
 
 app.get('/compare', (req, res) => {
   const page = generateComparePage();
-  res.send(renderPage('Comparare fișiere', page));
+  res.send(renderPage('Comparare fișiere', page, req.path));
 });
 
 app.listen(port, () => {

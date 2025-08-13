@@ -58,14 +58,14 @@ export default function setupHistoryRoutes(app) {
       </table>
     `;
 
-    res.send(renderPage('Istoric fișiere', `<h1>Istoric fișiere încărcate</h1>${table}`));
+    res.send(renderPage('Istoric fișiere', `<h1>Istoric fișiere încărcate</h1>${table}`, req.path));
   });
 
   app.get('/view/:filename', (req, res) => {
     const filepath = path.join('uploads', req.params.filename);
 
     if (!fs.existsSync(filepath)) {
-      return res.send(renderPage('Fișier lipsă', `<p>Fișierul nu a fost găsit.</p>`));
+      return res.send(renderPage('Fișier lipsă', `<p>Fișierul nu a fost găsit.</p>`, req.path));
     }
 
     const data = readExcelData(filepath);
@@ -74,6 +74,6 @@ export default function setupHistoryRoutes(app) {
     res.send(renderPage('Vizualizare fișier', `
       <h1>Vizualizare fișier: ${req.params.filename}</h1>
       ${table}
-    `));
+    `, req.path));
   });
 }

@@ -60,7 +60,7 @@ export default function setupUploadRoute(app) {
         <button type="submit">Upload</button>
       </form>
       ${lastFileInfo}
-    `));
+    `, req.path));
 
   });
 
@@ -90,7 +90,7 @@ export default function setupUploadRoute(app) {
 
   app.post('/upload', upload.single('excelFile'), (req, res) => {
     if (!req.file) {
-      return res.send(renderPage('Eroare', '<p>Niciun fișier primit.</p>'));
+      return res.send(renderPage('Eroare', '<p>Niciun fișier primit.</p>', req.path));
     }
 
     const filepath = req.file.path; // ex: uploads/abcd1234
@@ -99,21 +99,24 @@ export default function setupUploadRoute(app) {
 
     const decName = req.file.filename + '_dec.xlsx';
     const decDest = path.join('uploads', decName);
-    
 
-    let data;
+    let data = [];
     let usedDecrypted = false;
+    let storedNameForHistory = req.file.filename;
 
-    // 1) încearcă parsarea normală
+    // helper: citește doar foaia Variabile_Globale
+    function readVariabileGlobaleSheet(file) {
+      const sheets = xlsx.parse(fs.readFileSync(file));
+      const vg = sheets.find(s => s.name === 'Variabile_Globale');
+      return vg ? vg.data : [];
+    }
+
     try {
-      data = xlsx.parse(fs.readFileSync(filepath))[0]?.data || [];
+      data = readVariabileGlobaleSheet(filepath);
     } catch (err) {
-      // 2) dacă avem parolă, încearcă decriptare cu Python
       if (password) {
-        const scriptPath = path.resolve('decrypt_xlsx.py'); // sau path.resolve('py/decrypt_xlsx.py')
+        const scriptPath = path.resolve('decrypt_xlsx.py');
         const outPath = `${filepath}-dec.xlsx`;
-
-        
 
         const { ok, log } = runPythonDecrypt(scriptPath, path.resolve(filepath), password, path.resolve(outPath));
         if (!ok) {
@@ -122,48 +125,41 @@ export default function setupUploadRoute(app) {
         }
 
         try {
-          data = xlsx.parse(fs.readFileSync(outPath))[0]?.data || [];
-          usedDecrypted = true;
-          // dacă vrei, poți REPLASA fișierul original în istoric cu cel decriptat
-          // fs.renameSync(outPath, filepath);
-          // usedDecrypted = false; // pentru a nu-l șterge la cleanup
           fs.renameSync(outPath, decDest);
-
+          data = readVariabileGlobaleSheet(decDest);
+          usedDecrypted = true;
+          storedNameForHistory = decName;
         } catch (e2) {
           return res.send(renderPage('Eroare',
-            `<p>Fișierul decriptat nu a putut fi citit.</p><a href="/">Înapoi</a>`));
-        } finally {
-          
-          try { 
-            if (usedDecrypted) {
-              // curăță temporarul decriptat dacă l-ai folosit doar pentru citire
-              // fs.unlinkSync(outPath); 
-            }
-          } catch {}
+            `<p>Fișierul decriptat nu a putut fi citit.</p><a href="/">Înapoi</a>`, req.path));
         }
       } else {
-        // 3) fără parolă → dă mesaj prietenos
         return res.send(renderPage('Fișier protejat',
-          `<p>Fișierul pare protejat cu parolă. Introdu parola și reîncarcă fișierul.</p><a href="/">Înapoi</a>`));
+          `<p>Fișierul pare protejat cu parolă. Introdu parola și reîncarcă fișierul.</p><a href="/">Înapoi</a>`, req.path));
       }
     }
 
-    // 4) salvează în istoric (păstrează fișierul în uploads/)
     appendToHistory({
       originalName: req.file.originalname,
-      storedName: decName,              // <- acum History va folosi DECRIPTAT
-      sourceEncryptedName: req.file.filename, // optional, ca referință
-      wasDecrypted: true,
+      storedName: storedNameForHistory,
+      sourceEncryptedName: usedDecrypted ? req.file.filename : undefined,
+      wasDecrypted: usedDecrypted,
       sizeKB: Math.round(req.file.size / 1024),
-      uploadedAt: new Date().toISOString()
+      uploadedAt: uploadTime
     });
-    const table = generateHtmlTable(data);
+
+    let table;
+    if (!data.length) {
+      table = `<p><strong>Atenție:</strong> Sheet-ul <code>Variabile_Globale</code> nu există sau este gol.</p>`;
+    } else {
+      table = generateHtmlTable(data);
+    }
 
     res.send(renderPage('Fișier încărcat', `
       <h1>Fișier procesat: ${req.file.originalname}</h1>
       <div><strong>Încărcat la:</strong> ${new Date(uploadTime).toLocaleString('ro-RO')}</div>
       ${table}
-    `));
+    `, req.path));
   });
 
 }
